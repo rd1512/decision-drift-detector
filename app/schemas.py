@@ -12,3 +12,4 @@ class PredictionRequest(BaseModel):
 class PredictionResponse(BaseModel):
     decision: str
     probability: float
+    prediction_id: str
