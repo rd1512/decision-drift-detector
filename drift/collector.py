@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from storage.database import get_connection
+from storage.database import get_db_connection
 from app.config import MODEL_VERSION
 
 
@@ -14,12 +14,12 @@ def log_prediction(
     prediction_id = str(uuid.uuid4())
     timestamp = datetime.utcnow().isoformat()
 
-    conn = get_connection()
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     cursor.execute(
         """
-        INSERT INTO prediction_logs
+        INSERT INTO predictions
         (prediction_id, timestamp, decision, probability, latency_ms,
          input_mean, input_std, model_version)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)

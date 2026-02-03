@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS prediction_logs (
+CREATE TABLE IF NOT EXISTS predictions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     prediction_id TEXT NOT NULL UNIQUE,
     timestamp TEXT NOT NULL,

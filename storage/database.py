@@ -1,8 +1,7 @@
-import sqlite3
 from pathlib import Path
+import sqlite3
 
 DB_PATH = Path(__file__).resolve().parent / "predictions.db"
 
-
-def get_connection():
+def get_db_connection():
     return sqlite3.connect(DB_PATH)
