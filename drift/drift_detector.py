@@ -4,6 +4,9 @@ from datetime import datetime, timedelta
 import os
 from typing import List
 from monitoring.slack_alerts import send_slack_alert
+from prometheus_client import Gauge, start_http_server
+import time
+
 
 
 # Config
@@ -16,6 +19,10 @@ MIN_SAMPLES = 30
 # Drift threshold
 DRIFT_THRESHOLD = 0.15  # tunable
 
+kl_metric = Gauge(
+    "model_kl_divergence",
+    "KL divergence between baseline and recent predictions"
+)
 
 
 # Database helpers
@@ -110,6 +117,7 @@ def run_drift_detection():
     recent_dist = build_distribution(recent_probs)
 
     kl_divergence = compute_kl_divergence(baseline_dist, recent_dist)
+    kl_metric.set(kl_divergence)
 
     drift_detected = kl_divergence > DRIFT_THRESHOLD
 
@@ -131,4 +139,9 @@ def run_drift_detection():
 
 
 if __name__ == "__main__":
+    start_http_server(8001)
     run_drift_detection()
+
+    # keep process alive so /metrics stays accessible
+    while True:
+        time.sleep(10)
