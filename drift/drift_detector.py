@@ -3,6 +3,7 @@ import numpy as np
 from datetime import datetime, timedelta
 import os
 from typing import List
+from monitoring.slack_alerts import send_slack_alert
 
 
 # Config
@@ -11,6 +12,10 @@ DB_PATH = os.path.join(BASE_DIR, "storage", "predictions.db")
 NUM_BINS = 5
 EPSILON = 1e-6
 MIN_SAMPLES = 30
+
+# Drift threshold
+DRIFT_THRESHOLD = 0.15  # tunable
+
 
 
 # Database helpers
@@ -106,7 +111,23 @@ def run_drift_detection():
 
     kl_divergence = compute_kl_divergence(baseline_dist, recent_dist)
 
+    drift_detected = kl_divergence > DRIFT_THRESHOLD
+
     print(f"KL Divergence (baseline || recent): {kl_divergence:.6f}")
+
+    if drift_detected:
+        drift_excess = kl_divergence - DRIFT_THRESHOLD
+        print(
+            f"Drift detected: exceeded threshold by "
+            f"{drift_excess:.6f} (threshold={DRIFT_THRESHOLD})"
+        )
+        send_slack_alert(
+            kl_divergence,
+            DRIFT_THRESHOLD,
+            drift_excess
+        )
+    else:
+        print("No significant drift detected")
 
 
 if __name__ == "__main__":
