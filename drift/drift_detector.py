@@ -144,4 +144,5 @@ if __name__ == "__main__":
 
     # keep process alive so /metrics stays accessible
     while True:
-        time.sleep(10)
+        run_drift_detection()
+        time.sleep(60)  # recompute drift every 60 seconds
